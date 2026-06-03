@@ -1,0 +1,25 @@
+{
+  "episode": 1,
+  "title": "醒在凶案现场 fixture",
+  "out_dir": "video/ep001",
+  "defaults": {
+    "model": "doubao-seedance-1-5-pro-251215",
+    "resolution": "720p",
+    "ratio": "9:16",
+    "duration": 4,
+    "camera_fixed": false,
+    "generate_audio": false,
+    "watermark": false
+  },
+  "series_style": "竖屏短剧，暗黑悬疑，冷蓝雨夜，低照度，高对比，轻微手持摄影。",
+  "episode_style": "地点是旧城区烂尾楼三层，破窗漏雨，警灯红蓝光从窗外闪过。沈砚脸色苍白，深色湿外套，左手腕旧疤。",
+  "negative_prompt": "血腥伤口特写、肢体破坏、乱码文字、人物换脸、服装变化、空间方向混乱",
+  "shots": [
+    {
+      "id": "ep001_s001",
+      "duration": 4,
+      "seed": 1001,
+      "prompt": "镜头一，案发现场低角度特写。水果刀已经落在潮湿水泥地上，旁边有暗红血迹和雨水反光。镜头缓慢推近刀尖，背景保持烂尾楼冷蓝雨夜，不出现复杂文字。"
+    }
+  ]
+}

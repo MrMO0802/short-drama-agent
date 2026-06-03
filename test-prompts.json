@@ -1,0 +1,22 @@
+[
+  {
+    "id": "happy_path_ep001",
+    "prompt": "使用 short-drama-agent，把 episodes/ep001.md 转换成 AI 视频制作方案，保存到 video/ep001/ai-production-plan.md。先提取角色图、场景图、物品图、线索图和关键帧资产，再生成连续性 Seedance 镜头任务卡。",
+    "expected": "Reads the episode and relevant character context, writes a full production plan, creates asset-manifest/image-generation task expectations, then produces continuity-first 2-4 second video shot cards and copy-ready prompts."
+  },
+  {
+    "id": "pasted_script_with_ui",
+    "prompt": "我粘贴一段含手机短信、新闻推送和监控时间码的短剧剧本，请用短剧agent生成 AI 视频分镜，要求屏幕文字不要交给视频模型生成。",
+    "expected": "Produces a production plan that treats screen text/UI as post overlays, reserves blank screen areas, and keeps prop and clue states continuous."
+  },
+  {
+    "id": "revise_existing_seedance",
+    "prompt": "第一集 Seedance 粗剪不连贯。请用 short-drama-agent 检查 video/ep001/seedance-prompts.json 和 episodes/ep001.md，输出需要重做的连续性分镜方案。",
+    "expected": "Compares the script and existing manifest, identifies continuity risks, prioritizes script causality, and marks shots/keyframes that need regeneration without blindly overwriting existing files."
+  },
+  {
+    "id": "asset_to_video_execution",
+    "prompt": "我给你一集剧本，请先抽取需要生成的角色、场景、物品、UI留白和关键帧资产，调用图像模型生成资产，验收后再调用视频模型逐镜生成。不要一次性生成整集。",
+    "expected": "Uses explicit paid-generation and asset-approval checkpoints, creates asset and generation queues, then dry-runs or executes image generation before building one-by-one video generation tasks."
+  }
+]
