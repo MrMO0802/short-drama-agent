@@ -1,6 +1,6 @@
 ---
 name: short-drama-agent
-description: "Convert a short-drama episode script into AI video production files and generation workflow: asset extraction for character, scene, prop, clue, UI-overlay, and keyframe images; Seedream/other image-model prompts and task manifests; continuity-first shot language; Seedance/other video-model shot manifests; one-by-one generation, review, retry, and edit guidance. Use when the user mentions 短剧agent, 短剧 Agent, AI短剧导演, 分镜师, 连续性监督, AI视频提示词工程师, 剧本转分镜, 资产提取, 角色图, 场景图, 物品图, Seedream, Seedance, or asks to turn an episode script into AI-generated assets, storyboard, video prompts, or generated clips."
+description: "Convert a short-drama episode script into AI video production files and generation workflow: asset extraction for character, scene, prop, clue, UI-overlay, and keyframe images; Seedream/other image-model prompts and task manifests; continuity-first shot language; professional cinematography prompt language that resolves placeholder examples like <location>, <role>, and <duration-ms> into concrete scene/role/duration content; Seedance/other video-model shot manifests; one-by-one generation, review, retry, and edit guidance. Use when the user mentions 短剧agent, 短剧 Agent, AI短剧导演, 分镜师, 连续性监督, AI视频提示词工程师, 剧本转分镜, 资产提取, 角色图, 场景图, 物品图, 专业镜头语言, 分镜提示词优化, professional storyboard, Seedream, Seedance, or asks to turn an episode script into AI-generated assets, storyboard, video prompts, or generated clips."
 ---
 
 # Short Drama Agent
@@ -18,6 +18,7 @@ Act as an AI short-drama director, storyboard artist, continuity supervisor, AI 
 Accept any of these inputs:
 
 - A pasted episode script.
+- A professional storyboard example that contains placeholder tags such as `<location>L1</location>`, `<role>R5</role>`, or `<duration-ms>6000</duration-ms>`. Treat those tags as references to resolve, not as final prompt syntax to copy.
 - A path such as `episodes/ep001.md`.
 - A request naming an episode in a project that already has `episodes/`, `characters.md`, `creative-plan.md`, or `video/assets/characters/`.
 
@@ -54,13 +55,14 @@ If the user gives only a script, infer missing production details conservatively
 5. Require asset review before paid video generation. Mark each asset as `approved`, `needs_regeneration`, or `missing`. It is valid to write planning or dry-run manifests that reference missing assets when every affected shot is marked `blocked_by_missing_asset`; do not submit paid video tasks from rejected or missing anchor assets.
 6. Write continuity-first shot language. Convert the episode into 2-4 second AI video tasks. Each shot must perform exactly one action and include start state, end state, next-shot connection, reference assets, tail-frame needs, and prohibited changes.
 7. Attach copy-ready video prompts. For every shot task, provide a directly usable prompt block with project style, references, fixed continuity, action, ending state, next-shot connection, and prohibitions.
-8. Execute video generation one shot at a time. Start with dry-run payloads, then generate one representative shot, then proceed in small batches with `--skip-existing` or equivalent. Review each clip before accepting it into the edit.
-9. Add edit guidance. Include pacing, sound bridges, post overlays, removable shots, mandatory shots, and AI generation risks.
-10. Run the final checklist. Verify continuity, screen direction, prop states, information reveal order, asset dependencies, and that complex text/UI is reserved for post-production overlays.
+8. Produce professional cinematography prompt language when preparing video-model prompts or when the user provides a placeholder-tag example. Read `references/tagged-storyboard-format.md`, map Location/Role/Prop IDs to concrete assets, then replace placeholder positions with the actual scene, character, duration, camera, lighting, POV, and performance details. Do not preserve XML-like tags in final prompts unless a target API explicitly requires them.
+9. Execute video generation one shot at a time. Start with dry-run payloads, then generate one representative shot, then proceed in small batches with `--skip-existing` or equivalent. Review each clip before accepting it into the edit.
+10. Add edit guidance. Include pacing, sound bridges, post overlays, removable shots, mandatory shots, and AI generation risks.
+11. Run the final checklist. Verify continuity, screen direction, prop states, information reveal order, asset dependencies, and that complex text/UI is reserved for post-production overlays.
 
 ## Output Contract
 
-Before producing a full plan, read `references/production-plan-contract.md` and follow its section order and field requirements. When the task includes asset generation or model calls, also read `references/asset-to-video-pipeline.md`. If the user requests a partial deliverable, use the relevant contract sections without inventing a different structure.
+Before producing a full plan, read `references/production-plan-contract.md` and follow its section order and field requirements. When the task includes asset generation or model calls, also read `references/asset-to-video-pipeline.md`. When the user asks for professional agent-style prompts or provides `<location>/<role>/<duration-ms>` examples, read `references/tagged-storyboard-format.md` and resolve those placeholders into concrete prompt text. If the user requests a partial deliverable, use the relevant contract sections without inventing a different structure.
 
 For full episode work, write a Markdown production file:
 
@@ -69,6 +71,7 @@ For full episode work, write a Markdown production file:
 - If the task includes asset extraction, also create `video/epNN/assets/asset-manifest.json`.
 - If the task includes image generation, also create `video/epNN/assets/image-generation-tasks.json`.
 - If the task includes video generation, also create `video/epNN/video-shot-tasks.json` and a model-specific manifest such as `video/epNN/seedance-prompts.json`.
+- If the task includes professional prompt language, also create `video/epNN/professional-shot-prompts.md` and include each shot's resolved professional prompt in the model-neutral/video manifest when useful.
 
 When outputting in chat instead of a file, keep the structure intact. If the full result is too large, state that the production file contains the complete plan and summarize only the highest-signal sections in chat.
 
@@ -94,6 +97,8 @@ Do not add extra confirmation steps for ordinary analysis, prompt writing, or ne
 - Do not let AI video generate complex Chinese text, phone messages, news titles, UI, timecodes, subtitles, chat records, maps, or files. Leave screen space blank and mark those items for post overlay.
 - Do not call the video model before extracting and locking the required character, scene, prop/clue, and keyframe assets.
 - Make every video shot do one visible action only.
+- Treat `<duration-ms>`, `<location>`, and `<role>` from examples as placeholders. Convert them into `duration_ms`, resolved scene descriptions, and resolved character descriptions. If the model requires longer generation duration, keep the edit duration as metadata and fill extra time with camera hold, slow push, breathing, or focus transfer instead of adding story actions.
+- For inner monologue, explicitly write that the character is thinking and not speaking, such as `在心里想...此时他没有张嘴`. For POV/empty shots, state whose POV owns the frame and whether this is an empty shot.
 - Make every shot add information, establish space, advance action, or create an edit point. Mark empty atmosphere shots for deletion or merging.
 - Use explicit prohibitions: no new unrelated characters, no costume changes, no space-direction changes, no prop-state reset, no乱码文字, no premature clue reveal.
 - Treat Seedream as the storyboard/keyframe generator and Seedance as the motion generator when both are available.

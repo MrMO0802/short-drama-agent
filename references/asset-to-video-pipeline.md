@@ -12,10 +12,11 @@ Run the production chain in this order:
 4. Image generation or dry-run payload generation.
 5. Asset review and approval.
 6. Continuity-first shot language.
-7. Video-model manifest generation.
-8. One-shot video test.
-9. Small-batch video generation.
-10. Clip review, retry, rough cut, and post-overlay list.
+7. Professional placeholder-resolved shot prompt layer when useful.
+8. Video-model manifest generation.
+9. One-shot video test.
+10. Small-batch video generation.
+11. Clip review, retry, rough cut, and post-overlay list.
 
 Do not skip from script analysis directly to video generation.
 
@@ -138,6 +139,22 @@ Write video prompts from state, not from mood. Each shot prompt must include:
 
 Every shot must name the exact asset IDs it depends on.
 
+## Professional Placeholder-Resolved Shot Prompt Layer
+
+When prompts will be copied into a professional video-agent interface, or when the user provides examples with `<location>`, `<role>`, or `<duration-ms>` placeholders, create `video/epNN/professional-shot-prompts.md` after the shot cards and before paid video generation.
+
+The professional prompt layer must:
+
+- define Location/Role/Prop/Clue placeholder maps before shots
+- parse placeholder tags from examples, then replace them with concrete scene, role, asset, and duration content
+- avoid literal XML-like tags in final prompts unless a target API explicitly requires that syntax
+- preserve the shot card's single action, start/end state, prop state, and next-cut motive
+- include concrete camera language: angle, shot size, camera height or POV, lens, movement, focus, lighting, palette
+- mark inner monologue as thought/post voiceover and explicitly say the role does not open their mouth
+- treat phone/news/UI/surveillance/file/map text as post overlay with blank screen space
+
+Use `duration_ms` for edit intent. If the video API requires a longer duration, put that value in `generation_duration` or the model-specific manifest's `duration`, and keep `edit_target_duration` for trimming. Fill extra generated time with camera hold, slow push, rack focus, breathing, or handheld drift rather than adding new story action.
+
 ## Video Manifest
 
 Create `video/epNN/video-shot-tasks.json` as the model-neutral shot list. Create `video/epNN/seedance-prompts.json` or another model-specific dry-run manifest when the user needs payload validation before assets are approved.
@@ -148,6 +165,8 @@ For model-neutral tasks, include:
 {
   "shot_id": "ep001_s001",
   "duration": 3,
+  "duration_ms": 3000,
+  "generation_duration": 5,
   "depends_on_assets": [
     "scene_unfinished_building_room",
     "prop_knife_floor",
@@ -159,13 +178,14 @@ For model-neutral tasks, include:
   "end_state": "",
   "next_connection": "",
   "video_prompt": "",
+  "resolved_professional_prompt": "分镜1，目标时长3000毫秒。旧城区烂尾楼三层案发房间内，沈砚猛地睁开眼...",
   "negative_prompt": "",
   "acceptance_criteria": [],
   "status": "ready"
 }
 ```
 
-For Seedance-style manifests, preserve compatibility with the local `scripts/seedance_generate.py` shape: `episode`, `title`, `out_dir`, `defaults`, `series_style`, `episode_style`, `negative_prompt`, and `shots`. When assets are not yet generated, omit `image_path`, keep asset IDs in the text prompt, and mark the corresponding model-neutral shot status as `blocked_by_missing_asset`.
+For Seedance-style manifests, preserve compatibility with the local `scripts/seedance_generate.py` shape: `episode`, `title`, `out_dir`, `defaults`, `series_style`, `episode_style`, `negative_prompt`, and `shots`. A shot may also include `edit_target_duration`, `duration_ms`, `generation_duration`, and `resolved_professional_prompt`; the local script will ignore unknown keys but they remain useful for review and trimming. When assets are not yet generated, omit `image_path`, keep asset IDs in the text prompt, and mark the corresponding model-neutral shot status as `blocked_by_missing_asset`.
 
 ## One-by-one Video Generation
 
@@ -207,3 +227,6 @@ Regenerate a video shot when:
 - The camera crosses the established action axis without motivation.
 - The shot cannot cut from the previous shot or into the next shot.
 - Complex text appears inside the video model output.
+- A professional prompt leaves unresolved `<location>`, `<role>`, `<duration-ms>`, prop, or clue placeholders in final model text.
+- A POV shot shows the POV owner's face without a mirror/screen/reflection reason.
+- Inner monologue makes the character move their mouth when the script says they are only thinking.

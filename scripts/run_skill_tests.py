@@ -68,6 +68,7 @@ def load_skill_texts() -> dict[str, str]:
         "skill": read(SKILL_DIR / "SKILL.md"),
         "contract": read(SKILL_DIR / "references" / "production-plan-contract.md"),
         "pipeline": read(SKILL_DIR / "references" / "asset-to-video-pipeline.md"),
+        "tagged": read(SKILL_DIR / "references" / "tagged-storyboard-format.md"),
     }
 
 
@@ -182,11 +183,66 @@ def test_asset_to_video_execution(texts: dict[str, str]) -> list[str]:
     return ["asset pipeline order enforced", "Seedream dry-run payload writes"]
 
 
+def test_professional_placeholder_resolution(texts: dict[str, str]) -> list[str]:
+    combined = "\n".join(texts.values())
+    require_all(
+        texts["skill"],
+        [
+            "professional cinematography prompt language",
+            "placeholder",
+            "resolve",
+            "professional-shot-prompts.md",
+            "Do not preserve XML-like tags",
+        ],
+        "SKILL.md placeholder resolution trigger/output",
+    )
+    require_all(
+        texts["contract"],
+        [
+            "### 16B. 专业镜头语言与占位符解析",
+            "Location Map",
+            "Role Map",
+            "Prop/Clue Map",
+            "此时他没有张嘴",
+        ],
+        "production contract professional prompt section",
+    )
+    require_all(
+        texts["pipeline"],
+        [
+            "Professional Placeholder-Resolved Shot Prompt Layer",
+            "resolved_professional_prompt",
+            "duration_ms",
+            "generation_duration",
+            "edit_target_duration",
+        ],
+        "pipeline professional prompt metadata",
+    )
+    require_all(
+        texts["tagged"],
+        [
+            "The tags in these examples are placeholders",
+            "Do not mechanically output XML-like tags",
+            "Resolved output should look like professional natural language",
+            "在心里想",
+            "画面中所有角色全程不说话",
+            "POV",
+        ],
+        "placeholder resolution reference",
+    )
+    require(
+        "Literal placeholder tags remain in final prompts" in combined,
+        "reference must reject unresolved literal placeholder tags",
+    )
+    return ["professional placeholder resolution supported", "inner-thought/no-mouth rules present"]
+
+
 TESTS: dict[str, Callable[[dict[str, str]], list[str]]] = {
     "happy_path_ep001": test_happy_path_ep001,
     "pasted_script_with_ui": test_pasted_script_with_ui,
     "revise_existing_seedance": test_revise_existing_seedance,
     "asset_to_video_execution": test_asset_to_video_execution,
+    "professional_placeholder_resolution": test_professional_placeholder_resolution,
 }
 
 

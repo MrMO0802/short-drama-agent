@@ -18,5 +18,10 @@
     "id": "asset_to_video_execution",
     "prompt": "我给你一集剧本，请先抽取需要生成的角色、场景、物品、UI留白和关键帧资产，调用图像模型生成资产，验收后再调用视频模型逐镜生成。不要一次性生成整集。",
     "expected": "Uses explicit paid-generation and asset-approval checkpoints, creates asset and generation queues, then dry-runs or executes image generation before building one-by-one video generation tasks."
+  },
+  {
+    "id": "professional_placeholder_resolution",
+    "prompt": "参考专业短剧agent格式：本片段场景设定在: <location>L1</location>,<location>L2</location>。分镜1<duration-ms>6000</duration-ms>里使用<role>R5</role>、POV、28mm、内心想但没有张嘴。注意这些标签只是占位符，最终提示词要替换成对应场景、角色和时长，不要照抄标签。",
+    "expected": "Resolves professional placeholder tags into concrete scene/role/duration content, uses broad cinematography language beyond the sample, preserves POV ownership and inner-thought/no-mouth rules, and connects the resolved prompt metadata to continuity-first video manifests."
   }
 ]

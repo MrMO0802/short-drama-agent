@@ -1,4 +1,4 @@
 interface:
   display_name: "短剧 Agent"
-  short_description: "把单集剧本转换为可生成、可剪辑、连续性稳定的 AI 视频制作方案。"
+  short_description: "把单集剧本转换为连续性稳定的 AI 视频方案，并输出专业镜头提示词。"
   default_prompt: "使用 short-drama-agent，把这一集剧本转换为 AI 视频制作方案。"

@@ -341,6 +341,38 @@ Execution order:
 4. Generate the next 3-5 shots with `skip existing` behavior.
 5. Keep accepted clips unchanged and rewrite only failed shot prompts.
 
+### 16B. 专业镜头语言与占位符解析
+
+After the generation queue, write a professional cinematography prompt layer when video prompts will be copied to a model interface or when the user provides an example with placeholder tags. Read `references/tagged-storyboard-format.md` before writing this section.
+
+First define stable placeholder maps:
+
+- Location Map: `L1`, `L2`, etc. mapped to scene asset IDs and fixed geography.
+- Role Map: `R1`, `R2`, etc. mapped to character asset IDs, reference images, and continuity descriptions.
+- Prop/Clue Map: `P1`, `C1`, etc. mapped to locked prop and clue assets when needed.
+
+Then write resolved professional prompts. Do not keep literal XML-like tags in final prompts unless a target API explicitly requires them. Replace placeholders with concrete scene, role, duration, camera, lighting, and performance content:
+
+```text
+分镜1，目标时长3000毫秒。恐怖电影风格真人写实，低饱和冷蓝色调，局部硬光制造戏剧性阴影。荷兰角，极端近景，机位贴近旧城区烂尾楼三层案发房间的潮湿水泥地，拍摄沈砚猛地睁开眼...
+分镜2，目标时长4000毫秒。主观视点镜头，来自沈砚的视角，在同一案发房间内惊恐扫过冰冷混凝土地面...
+```
+
+Each resolved professional shot must include:
+
+- target edit duration in milliseconds.
+- resolved locked scene reference, not a bare `L1` tag.
+- resolved visible roles or POV-owning roles, not a bare `R5` tag.
+- style family, palette, lighting, camera angle, shot size, camera height or POV, lens/focal length, motion, focus behavior, and blur when relevant.
+- the exact location geography and prop/clue state that must remain continuous.
+- one visible action only.
+- body position and gaze direction, or a clear empty-frame rule.
+- inner monologue as thought/post voiceover, with `此时他没有张嘴` or `画面中所有角色全程不说话`.
+- `视频中只保留屏幕留白，文字后期叠加` for phones, UI, news, SMS, maps, files, surveillance, or timecodes.
+- prohibitions for high-risk continuity failures.
+
+If a video model requires 5-6 second generation but the edit target is 2-4 seconds, preserve both values: `duration_ms` for edit intent and `generation_duration` in the manifest for model submission. Do not add extra plot actions to fill model time.
+
 ### 17. 每个镜头可直接复制给视频 AI 的提示词
 
 After each shot task card, include this prompt block:
@@ -444,3 +476,8 @@ Check:
 23. 是否先生成角色图、场景图、物品图、线索图，再生成关键帧？
 24. 是否经过资产验收后才调用视频模型？
 25. 是否按 dry-run、单镜测试、小批量生成的顺序执行？
+26. 专业镜头提示词是否定义并使用了 Location/Role/Prop placeholder map？
+27. 每个专业镜头提示词是否把 `<duration-ms>`、`<location>`、`<role>` 等占位符解析成了具体时长、场景和角色？
+28. 内心独白是否明确为心里想/后期旁白，并禁止角色张嘴？
+29. POV 或无人空镜是否明确了视角归属？
+30. 专业镜头提示词是否没有用额外动作填充模型生成时长？
