@@ -112,6 +112,7 @@ Do not limit the skill to the user's sample. Choose terms that serve story clari
 
 - Angles: 荷兰角、贴地低机位、过肩镜头、俯拍、仰拍、平视、主观视点、监控视角、镜面反射视角。
 - Shot sizes: 极端近景、特写、中近景、中景、全景、远景、插入特写、证物特写。
+- Camera/lens anchors: IMAX film camera + Panavision C-series, Sony Venice + Canon K-35, Kodak 35mm bleach-bypass, Canon EF 85mm f/1.2 for portrait assets.
 - Lens: 18mm超广角、24/28mm广角、35mm标准、50mm人像、85mm压缩空间、微距镜头。
 - Movement: 手持晃动、缓慢推进、快速甩镜、视线摇移、跟拍、横移、拉焦、呼吸式微动、短促变焦。
 - Lighting: 局部硬光、顶灯闪烁、警灯红蓝反射、窗外冷光、低照度、高对比阴影、背光剪影、实景光源。
@@ -129,6 +130,7 @@ Resolved professional prompts must inherit shot-card continuity:
 - Same prop state; a weapon on the ground cannot return to a hand without an explicit pickup shot.
 - Same clue reveal order; do not reveal later clues early.
 - Screen text/UI remains blank for post overlay unless the user explicitly requests otherwise.
+- Mx-Shell-style polish can add real camera/lens anchors, subtle breath-like camera float, production-audio policy, and imperfection anchors, but it cannot add extra plot actions or reset continuity.
 
 ## Reject These Outputs
 

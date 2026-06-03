@@ -1,6 +1,6 @@
 ---
 name: short-drama-agent
-description: "Convert a short-drama episode script into AI video production files and generation workflow: asset extraction for character, scene, prop, clue, UI-overlay, and keyframe images; Seedream/other image-model prompts and task manifests; continuity-first shot language; professional cinematography prompt language that resolves placeholder examples like <location>, <role>, and <duration-ms> into concrete scene/role/duration content; Seedance/other video-model shot manifests; one-by-one generation, review, retry, and edit guidance. Use when the user mentions 短剧agent, 短剧 Agent, AI短剧导演, 分镜师, 连续性监督, AI视频提示词工程师, 剧本转分镜, 资产提取, 角色图, 场景图, 物品图, 专业镜头语言, 分镜提示词优化, professional storyboard, Seedream, Seedance, or asks to turn an episode script into AI-generated assets, storyboard, video prompts, or generated clips."
+description: "Convert a short-drama episode script into AI video production files and generation workflow: asset extraction for character, scene, prop, clue, UI-overlay, and keyframe images; Seedream/other image-model prompts and task manifests; continuity-first shot language; professional cinematography prompt language that resolves placeholder examples like <location>, <role>, and <duration-ms> into concrete scene/role/duration content; Mx-Shell/ai-shortfilm-prompts style 5-stage cinematic prompt polish with camera/lens, subtle breath-like camera float, production audio, imperfection anchors, and IP-filter-safe wording; Seedance/other video-model shot manifests; one-by-one generation, review, retry, and edit guidance. Use when the user mentions 短剧agent, 短剧 Agent, AI短剧导演, 分镜师, 连续性监督, AI视频提示词工程师, 剧本转分镜, 资产提取, 角色图, 场景图, 物品图, 专业镜头语言, 分镜提示词优化, professional storyboard, Mx-Shell, ai-shortfilm-prompts, 5-stage cinematic prompts, Seedream, Seedance, or asks to turn an episode script into AI-generated assets, storyboard, video prompts, or generated clips."
 ---
 
 # Short Drama Agent
@@ -19,6 +19,7 @@ Accept any of these inputs:
 
 - A pasted episode script.
 - A professional storyboard example that contains placeholder tags such as `<location>L1</location>`, `<role>R5</role>`, or `<duration-ms>6000</duration-ms>`. Treat those tags as references to resolve, not as final prompt syntax to copy.
+- A request to borrow Mx-Shell / `ai-shortfilm-prompts` / 5-stage shortfilm prompt techniques. Treat that workflow as a prompt-polish layer, not as a reason to abandon continuity tables.
 - A path such as `episodes/ep001.md`.
 - A request naming an episode in a project that already has `episodes/`, `characters.md`, `creative-plan.md`, or `video/assets/characters/`.
 
@@ -56,13 +57,14 @@ If the user gives only a script, infer missing production details conservatively
 6. Write continuity-first shot language. Convert the episode into 2-4 second AI video tasks. Each shot must perform exactly one action and include start state, end state, next-shot connection, reference assets, tail-frame needs, and prohibited changes.
 7. Attach copy-ready video prompts. For every shot task, provide a directly usable prompt block with project style, references, fixed continuity, action, ending state, next-shot connection, and prohibitions.
 8. Produce professional cinematography prompt language when preparing video-model prompts or when the user provides a placeholder-tag example. Read `references/tagged-storyboard-format.md`, map Location/Role/Prop IDs to concrete assets, then replace placeholder positions with the actual scene, character, duration, camera, lighting, POV, and performance details. Do not preserve XML-like tags in final prompts unless a target API explicitly requires them.
-9. Execute video generation one shot at a time. Start with dry-run payloads, then generate one representative shot, then proceed in small batches with `--skip-existing` or equivalent. Review each clip before accepting it into the edit.
-10. Add edit guidance. Include pacing, sound bridges, post overlays, removable shots, mandatory shots, and AI generation risks.
-11. Run the final checklist. Verify continuity, screen direction, prop states, information reveal order, asset dependencies, and that complex text/UI is reserved for post-production overlays.
+9. Apply the Mx-Shell-style 5-stage cinematic polish layer when the user mentions Mx-Shell, `ai-shortfilm-prompts`, or when the generated prompts need stronger visual control. Read `references/mx-shell-workflow-adapter.md`; add concrete theme tags, locked character/scene/material details, real camera/lens anchors, controlled subtle camera float or fixed-camera reason, production-audio policy, imperfection anchors, restrained endings, and IP-filter-safe wording without adding extra story actions.
+10. Execute video generation one shot at a time. Start with dry-run payloads, then generate one representative shot, then proceed in small batches with `--skip-existing` or equivalent. Review each clip before accepting it into the edit.
+11. Add edit guidance. Include pacing, sound bridges, post overlays, removable shots, mandatory shots, and AI generation risks.
+12. Run the final checklist. Verify continuity, screen direction, prop states, information reveal order, asset dependencies, prompt concreteness, camera/lens anchors, sound policy, and that complex text/UI is reserved for post-production overlays.
 
 ## Output Contract
 
-Before producing a full plan, read `references/production-plan-contract.md` and follow its section order and field requirements. When the task includes asset generation or model calls, also read `references/asset-to-video-pipeline.md`. When the user asks for professional agent-style prompts or provides `<location>/<role>/<duration-ms>` examples, read `references/tagged-storyboard-format.md` and resolve those placeholders into concrete prompt text. If the user requests a partial deliverable, use the relevant contract sections without inventing a different structure.
+Before producing a full plan, read `references/production-plan-contract.md` and follow its section order and field requirements. When the task includes asset generation or model calls, also read `references/asset-to-video-pipeline.md`. When the user asks for professional agent-style prompts or provides `<location>/<role>/<duration-ms>` examples, read `references/tagged-storyboard-format.md` and resolve those placeholders into concrete prompt text. When the user mentions Mx-Shell, `ai-shortfilm-prompts`, 5-stage prompt structure, cinematic prompt polish, or Seedance 2.0 immersive shorts, read `references/mx-shell-workflow-adapter.md` and adapt the method into continuity-safe shot prompts. If the user requests a partial deliverable, use the relevant contract sections without inventing a different structure.
 
 For full episode work, write a Markdown production file:
 
@@ -99,6 +101,10 @@ Do not add extra confirmation steps for ordinary analysis, prompt writing, or ne
 - Make every video shot do one visible action only.
 - Treat `<duration-ms>`, `<location>`, and `<role>` from examples as placeholders. Convert them into `duration_ms`, resolved scene descriptions, and resolved character descriptions. If the model requires longer generation duration, keep the edit duration as metadata and fill extra time with camera hold, slow push, breathing, or focus transfer instead of adding story actions.
 - For inner monologue, explicitly write that the character is thinking and not speaking, such as `在心里想...此时他没有张嘴`. For POV/empty shots, state whose POV owns the frame and whether this is an empty shot.
+- For copy-ready video prompts, include concrete camera/lens anchors, palette/lighting behavior, physical textures, sound policy, and controlled camera movement. Avoid vague praise words unless they are backed by concrete visual details.
+- Add at least two realism imperfections for faces, costumes, props, equipment, or environments when realism matters. Too-perfect subjects should be treated as a generation risk.
+- Use subtle breath-like camera float only when handheld/subjective; use fixed camera for clue inserts, surveillance, or spatially precise shots.
+- Avoid IP names, brand names, and direct copyrighted character/style labels in final model prompts unless the user explicitly requires them; flag any remaining filter risk in post notes.
 - Make every shot add information, establish space, advance action, or create an edit point. Mark empty atmosphere shots for deletion or merging.
 - Use explicit prohibitions: no new unrelated characters, no costume changes, no space-direction changes, no prop-state reset, no乱码文字, no premature clue reveal.
 - Treat Seedream as the storyboard/keyframe generator and Seedance as the motion generator when both are available.
@@ -118,6 +124,8 @@ Reject or rewrite these outputs:
 - A prop state table that allows a weapon, phone, file, corpse, footprint, symbol, or wound to appear/disappear without a visible cause.
 - A keyframe that cannot name the information the audience gains.
 - A transition note that only says `切到下一镜` without sightline, action, sound, danger, space, emotion, or information motivation.
+- A copy-ready prompt that says only `电影感`, `高级`, `震撼`, `史诗`, `4K`, or `高质量` without camera/lens, lighting, material, motion, or composition anchors.
+- A final prompt with no sound policy, no camera/lens profile, no fixed-camera reason, no imperfection anchors, or an ending that adds unplanned explosions/victory poses/new plot actions.
 
 ## Quality Bar
 

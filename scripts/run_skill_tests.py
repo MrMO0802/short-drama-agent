@@ -69,6 +69,7 @@ def load_skill_texts() -> dict[str, str]:
         "contract": read(SKILL_DIR / "references" / "production-plan-contract.md"),
         "pipeline": read(SKILL_DIR / "references" / "asset-to-video-pipeline.md"),
         "tagged": read(SKILL_DIR / "references" / "tagged-storyboard-format.md"),
+        "mx_shell": read(SKILL_DIR / "references" / "mx-shell-workflow-adapter.md"),
     }
 
 
@@ -237,12 +238,71 @@ def test_professional_placeholder_resolution(texts: dict[str, str]) -> list[str]
     return ["professional placeholder resolution supported", "inner-thought/no-mouth rules present"]
 
 
+def test_mx_shell_workflow_adapter(texts: dict[str, str]) -> list[str]:
+    combined = "\n".join(texts.values())
+    require_all(
+        texts["skill"],
+        [
+            "Mx-Shell",
+            "ai-shortfilm-prompts",
+            "5-stage cinematic",
+            "camera/lens",
+            "breath-like camera float",
+            "imperfection anchors",
+        ],
+        "SKILL.md Mx-Shell workflow trigger/rules",
+    )
+    require_all(
+        texts["mx_shell"],
+        [
+            "Do not copy Mx-Shell source prompts",
+            "Episode-Compatible 5-Stage Layer",
+            "core_theme_tags",
+            "camera_lens_profile",
+            "Sound: No score. Production audio only.",
+            "imperfection_anchors",
+            "IP And Filter Rule",
+            "Restrained Ending Rule",
+        ],
+        "Mx-Shell adapter reference",
+    )
+    require_all(
+        texts["pipeline"],
+        [
+            "Mx-Shell-style 5-stage cinematic prompt polish",
+            "camera_lens_profile",
+            "sound_policy",
+            "imperfection_anchors",
+            "model_specific_advice",
+            "ip_filter_note",
+        ],
+        "pipeline Mx-Shell prompt metadata",
+    )
+    require_all(
+        texts["contract"],
+        [
+            "### 16C. Mx-Shell式5段镜头质感自检",
+            "camera_lens_profile",
+            "Sound: No score. Production audio only.",
+            "imperfection_anchors",
+            "Seedance",
+        ],
+        "production contract Mx-Shell section",
+    )
+    require(
+        "vague praise words" in combined and "电影感" in combined,
+        "Mx-Shell adaptation must reject vague praise words",
+    )
+    return ["Mx-Shell 5-stage prompt polish supported", "camera/sound/imperfection self-checks present"]
+
+
 TESTS: dict[str, Callable[[dict[str, str]], list[str]]] = {
     "happy_path_ep001": test_happy_path_ep001,
     "pasted_script_with_ui": test_pasted_script_with_ui,
     "revise_existing_seedance": test_revise_existing_seedance,
     "asset_to_video_execution": test_asset_to_video_execution,
     "professional_placeholder_resolution": test_professional_placeholder_resolution,
+    "mx_shell_workflow_adapter": test_mx_shell_workflow_adapter,
 }
 
 

@@ -2,7 +2,7 @@
 
 ![Codex Skill](https://img.shields.io/badge/Codex%20Skill-short--drama--agent-111827)
 ![Workflow](https://img.shields.io/badge/Workflow-Script%20%2B%20Assets%20%2B%20Continuity%20%2B%20Video-2563eb)
-![Tests](https://img.shields.io/badge/Tests-5%2F5%20passing-16a34a)
+![Tests](https://img.shields.io/badge/Tests-6%2F6%20passing-16a34a)
 ![Safety](https://img.shields.io/badge/API%20Calls-Checkpoint%20Protected-b45309)
 
 `short-drama-agent` 是一个面向 AI 短剧生产的 Codex Skill。它的目标不是把剧本改写成“漂亮的分镜文字”，而是把一集短剧拆成一套可以生成、可以审片、可以重跑、可以剪成连续视频的生产文件。
@@ -21,6 +21,7 @@
 | 你要调用 Seedance 逐镜生成 | 输出模型中立镜头表和 Seedance 风格 manifest |
 | 你已经有一版粗剪但不连贯 | 根据剧本、manifest、clip/contact sheet 找出需要重做的镜头 |
 | 你提供专业短剧 Agent 示例 | 解析 `<location>`、`<role>`、`<duration-ms>` 这类占位符，并替换成具体场景、角色和时长内容 |
+| 你想借鉴 Mx-Shell 工作流 | 把 5 段式、真实摄影机/镜头、呼吸感、同期声、瑕疵真实感和结尾留白转成连续性安全的逐镜提示词 |
 
 ## 它解决的问题
 
@@ -61,6 +62,7 @@ flowchart TD
 | 资产验收 | asset review table | 判断资产是否可锁定为视频参考图 |
 | 连续性监督 | continuity tables | 固定空间方向、角色状态、道具状态、线索揭示顺序 |
 | 专业镜头语言 | `professional-shot-prompts.md` | 把占位符示例解析成自然、专业、可复制的视频提示词 |
+| Mx-Shell式质感层 | shot metadata | 增加 `core_theme_tags`、`camera_lens_profile`、`sound_policy`、`imperfection_anchors` |
 | 视频镜头任务 | `video-shot-tasks.json` | 每镜 2-4 秒，只发生一件事，带开始/结束/衔接/禁止变化 |
 | Seedance manifest | `seedance-prompts.json` | 兼容本仓库脚本的逐镜视频生成任务 |
 | 审片重跑 | report / rejected clips | 只重写失败镜头，保留已通过镜头 |
@@ -117,7 +119,27 @@ Skill 结构遵循本地 `skill-creator` 的思路：
 - UI metadata 放进 `agents/openai.yaml`。
 - 使用 progressive disclosure，避免每次触发都加载无关细节。
 
-### 4. Darwin Skill 优化标准
+### 4. Mx-Shell / ai-shortfilm-prompts 工作流
+
+本次优化参考了 Mx-Shell 工作流仓库：
+
+- [ai-shortfilm-prompts](https://github.com/jnMetaCode/ai-shortfilm-prompts)
+- [Mx-Shell 提示词方法论](https://github.com/jnMetaCode/ai-shortfilm-prompts/blob/main/methodology.zh.md)
+- [shortfilm-prompt Claude Skill](https://github.com/jnMetaCode/ai-shortfilm-prompts/tree/main/.claude/skills/shortfilm-prompt)
+
+吸收的是方法，不是照搬原始提示词：
+
+- 5 段式结构：核心主题、人物场景、氛围画质、运镜规则、分镜时间轴。
+- 真实摄影机和镜头型号作为视觉锚点。
+- 轻微“呼吸感”手持浮动，避免 CG 式僵硬。
+- 明确同期声策略，避免让模型乱配乐。
+- 用瑕疵、磨损、污渍、划痕建立真实感。
+- 结尾留白，不靠额外爆炸、胜利姿势或强光填满。
+- 避免 IP 名、品牌名和角色名触发 Seedance 等模型过滤。
+
+在 `short-drama-agent` 里，这些技巧被放到 [`references/mx-shell-workflow-adapter.md`](./references/mx-shell-workflow-adapter.md)，作为逐镜提示词的最后质感层；它不能覆盖连续性、因果链、道具状态和线索揭示顺序。
+
+### 5. Darwin Skill 优化标准
 
 该 skill 按 Darwin/SkillLens 风格做过结构化优化，重点是：
 
@@ -127,7 +149,7 @@ Skill 结构遵循本地 `skill-creator` 的思路：
 - 把“会生成好看的文字”改成“会生成可执行生产文件”。
 - 对资产缺失、付费 API、覆盖文件、删除素材等风险做显式处理。
 
-### 5. Seedream / Seedance 生产流程
+### 6. Seedream / Seedance 生产流程
 
 工作流参考火山方舟 Seedream 和 Seedance 的官方接口与提示词实践：
 
@@ -200,6 +222,7 @@ short-drama-agent/
 │   └── openai.yaml
 ├── references/
 │   ├── asset-to-video-pipeline.md
+│   ├── mx-shell-workflow-adapter.md
 │   ├── production-plan-contract.md
 │   └── tagged-storyboard-format.md
 ├── scripts/
@@ -262,6 +285,10 @@ project-root/
 
 ```text
 我给你一段专业短剧 Agent 分镜样例，根据它优化这一集的专业镜头提示词，但不要保留标签。
+```
+
+```text
+参考 Mx-Shell 的 ai-shortfilm-prompts 工作流，优化每个 Seedance 镜头的质感，但保持短剧连续性优先。
 ```
 
 ### 输入一集剧本
@@ -369,7 +396,9 @@ video/ep001/
 - 机位：低机位、贴地机位、平视、高机位、俯拍、仰拍、荷兰角、主观视点
 - 镜头运动：手持跟拍、缓慢推进、横移、摇镜、甩镜、焦点转移、呼吸式微晃
 - 镜头参数：24mm/28mm/35mm/50mm/85mm，浅景深或深焦
+- 摄影机/镜头锚点：IMAX film camera + Panavision C-series、Sony Venice + Canon K-35、Kodak 35mm bleach-bypass
 - 光线：局部硬光、逆光、轮廓光、冷色环境光、闪烁灯管、低照度高反差
+- 真实瑕疵：汗、灰尘、布料磨损、金属划痕、墙面污渍、玻璃裂纹、低饱和颗粒感
 - 表演：惊恐失焦、强迫冷静、压低呼吸、僵住、迟疑、回避视线
 - 声音：呼吸、脚步、警笛、手机震动、门响、雨声、远处人声、环境底噪
 
@@ -390,6 +419,10 @@ video/ep001/
 - `next_connection`
 - `video_prompt`
 - `resolved_professional_prompt`
+- `core_theme_tags`
+- `camera_lens_profile`
+- `sound_policy`
+- `imperfection_anchors`
 - `negative_prompt`
 - `acceptance_criteria`
 - `status`
@@ -624,6 +657,7 @@ PASS pasted_script_with_ui
 PASS revise_existing_seedance
 PASS asset_to_video_execution
 PASS professional_placeholder_resolution
+PASS mx_shell_workflow_adapter
 ```
 
 测试会验证：
@@ -634,6 +668,7 @@ PASS professional_placeholder_resolution
 - Seedream 图片任务可以 dry-run。
 - 专业分镜样例中的占位符会被解析，不会原样留在最终提示词里。
 - 内心独白和“没有张嘴”规则被保留。
+- Mx-Shell式 5 段镜头质感层、摄影机/镜头、同期声、瑕疵真实感和 IP 规避规则存在。
 
 ## 质量检查
 

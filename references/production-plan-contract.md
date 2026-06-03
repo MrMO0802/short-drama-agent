@@ -373,6 +373,29 @@ Each resolved professional shot must include:
 
 If a video model requires 5-6 second generation but the edit target is 2-4 seconds, preserve both values: `duration_ms` for edit intent and `generation_duration` in the manifest for model submission. Do not add extra plot actions to fill model time.
 
+### 16C. Mx-Shell式5段镜头质感自检
+
+When the user mentions Mx-Shell, `ai-shortfilm-prompts`, Seedance 2.0 immersive shorts, or asks to optimize professional shortfilm prompt quality, read `references/mx-shell-workflow-adapter.md` and add this quality layer after the continuity shot cards.
+
+For each selected video prompt, include:
+
+- `core_theme_tags`: 3-6 concrete tags, from format to genre to aesthetic.
+- `locked_character_scene`: character identity, costume, body state, material, scene geography, active environment, and prop/clue state.
+- `atmosphere_quality`: real camera/lens profile, palette, lighting, film grain or physical texture.
+- `camera_rules`: shot size, angle, movement, screen direction, controlled subtle breath-like camera float or fixed-camera reason.
+- `storyboard_slice`: one visible action only, with action, camera, sound, and optional VFX.
+- `sound_policy`: `Sound: No score. Production audio only.` plus specific ambience or sound bridge.
+- `imperfection_anchors`: at least two realism imperfections when faces, costumes, props, equipment, or environments matter.
+- `restrained_ending`: hold on gaze, prop state, clue, threat, or environment instead of adding extra plot actions.
+- `model_specific_advice`: duration, Seedance filter risk, quality-model preference, or trimming advice.
+
+Hard rejects:
+
+- Empty praise such as `电影感`, `高级`, `震撼`, `史诗`, `4K`, or `高质量` without concrete camera/lens, material, light, or motion details.
+- Copying Mx-Shell source prompts verbatim instead of adapting the workflow.
+- Adding explosions, victory poses, new locations, new combat beats, or later clues just to make the shot more spectacular.
+- Leaving IP/brand/character names in final video-model prompts without a filter warning or replacement phrase.
+
 ### 17. 每个镜头可直接复制给视频 AI 的提示词
 
 After each shot task card, include this prompt block:
@@ -481,3 +504,10 @@ Check:
 28. 内心独白是否明确为心里想/后期旁白，并禁止角色张嘴？
 29. POV 或无人空镜是否明确了视角归属？
 30. 专业镜头提示词是否没有用额外动作填充模型生成时长？
+31. 是否在需要时加入 Mx-Shell式5段镜头质感层？
+32. copy-ready 提示词是否包含 camera_lens_profile 或明确固定机位理由？
+33. 是否写明 Sound: No score. Production audio only. 或等价同期声策略？
+34. 是否包含至少两个现实瑕疵/材质磨损/环境缺陷锚点？
+35. 是否避免空泛 praise words，改用光线、材质、构图、运动的具体描述？
+36. 结尾是否留在状态变化/环境/威胁/线索上，而不是额外加特效和新动作？
+37. 是否规避 Seedance 等模型可能拦截的 IP/品牌/角色名，或在后期备注里标出风险？

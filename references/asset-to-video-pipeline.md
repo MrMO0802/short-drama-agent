@@ -13,10 +13,11 @@ Run the production chain in this order:
 5. Asset review and approval.
 6. Continuity-first shot language.
 7. Professional placeholder-resolved shot prompt layer when useful.
-8. Video-model manifest generation.
-9. One-shot video test.
-10. Small-batch video generation.
-11. Clip review, retry, rough cut, and post-overlay list.
+8. Mx-Shell-style 5-stage cinematic prompt polish when useful.
+9. Video-model manifest generation.
+10. One-shot video test.
+11. Small-batch video generation.
+12. Clip review, retry, rough cut, and post-overlay list.
 
 Do not skip from script analysis directly to video generation.
 
@@ -155,6 +156,24 @@ The professional prompt layer must:
 
 Use `duration_ms` for edit intent. If the video API requires a longer duration, put that value in `generation_duration` or the model-specific manifest's `duration`, and keep `edit_target_duration` for trimming. Fill extra generated time with camera hold, slow push, rack focus, breathing, or handheld drift rather than adding new story action.
 
+## Mx-Shell-Style 5-Stage Prompt Polish Layer
+
+When the user mentions Mx-Shell, `ai-shortfilm-prompts`, Seedance 2.0 immersive shorts, or asks for stronger cinematic prompt quality, read `references/mx-shell-workflow-adapter.md`.
+
+Apply this layer after continuity shot cards and before paid video generation. Do not copy source prompts verbatim; adapt the method into shot-safe prompt metadata:
+
+- `core_theme_tags`: 3-6 concrete tags, not vague praise words.
+- `locked_character_scene`: character face/hair/costume/state, scene geography, active environment, and prop/clue state.
+- `camera_lens_profile`: concrete camera/lens anchor.
+- `palette_lighting`: color, light source, contrast, practical light, haze, grain.
+- `camera_rules`: shot type, shot size, angle, movement, screen direction, subtle breath-like float or fixed-camera reason.
+- `sound_policy`: `Sound: No score. Production audio only.` plus explicit scene sounds when useful.
+- `imperfection_anchors`: at least two imperfections when realism matters.
+- `restrained_ending`: hold on a state, gaze, prop, threat, or environment instead of adding new plot actions.
+- `model_specific_advice`: Seedance/IP filter, duration, or quality-model notes.
+
+This layer must inherit the shot card's one action and end state. It cannot add new characters, new locations, extra combat beats, explosions, victory poses, or later clues.
+
 ## Video Manifest
 
 Create `video/epNN/video-shot-tasks.json` as the model-neutral shot list. Create `video/epNN/seedance-prompts.json` or another model-specific dry-run manifest when the user needs payload validation before assets are approved.
@@ -179,13 +198,17 @@ For model-neutral tasks, include:
   "next_connection": "",
   "video_prompt": "",
   "resolved_professional_prompt": "分镜1，目标时长3000毫秒。旧城区烂尾楼三层案发房间内，沈砚猛地睁开眼...",
+  "core_theme_tags": ["恐怖悬疑短剧", "真人实拍质感", "低饱和冷色", "旧楼案发现场"],
+  "camera_lens_profile": "Sony Venice + Canon K-35, 28mm wide lens",
+  "sound_policy": "Sound: No score. Production audio only. 远处警笛、潮湿脚步、压低呼吸。",
+  "imperfection_anchors": ["脸色苍白有汗", "外套沾灰且右手血迹未干"],
   "negative_prompt": "",
   "acceptance_criteria": [],
   "status": "ready"
 }
 ```
 
-For Seedance-style manifests, preserve compatibility with the local `scripts/seedance_generate.py` shape: `episode`, `title`, `out_dir`, `defaults`, `series_style`, `episode_style`, `negative_prompt`, and `shots`. A shot may also include `edit_target_duration`, `duration_ms`, `generation_duration`, and `resolved_professional_prompt`; the local script will ignore unknown keys but they remain useful for review and trimming. When assets are not yet generated, omit `image_path`, keep asset IDs in the text prompt, and mark the corresponding model-neutral shot status as `blocked_by_missing_asset`.
+For Seedance-style manifests, preserve compatibility with the local `scripts/seedance_generate.py` shape: `episode`, `title`, `out_dir`, `defaults`, `series_style`, `episode_style`, `negative_prompt`, and `shots`. A shot may also include `edit_target_duration`, `duration_ms`, `generation_duration`, `resolved_professional_prompt`, `core_theme_tags`, `camera_lens_profile`, `sound_policy`, `imperfection_anchors`, `model_specific_advice`, and `ip_filter_note`; the local script will ignore unknown keys but they remain useful for review and trimming. When assets are not yet generated, omit `image_path`, keep asset IDs in the text prompt, and mark the corresponding model-neutral shot status as `blocked_by_missing_asset`.
 
 ## One-by-one Video Generation
 
@@ -230,3 +253,7 @@ Regenerate a video shot when:
 - A professional prompt leaves unresolved `<location>`, `<role>`, `<duration-ms>`, prop, or clue placeholders in final model text.
 - A POV shot shows the POV owner's face without a mirror/screen/reflection reason.
 - Inner monologue makes the character move their mouth when the script says they are only thinking.
+- A copy-ready prompt lacks a concrete camera/lens profile, sound policy, or fixed-camera reason.
+- A prompt uses vague praise words instead of physical material, light, motion, or composition details.
+- A prompt looks too clean or perfect when the story state should contain damage, dirt, sweat, scratches, worn fabric, broken glass, or other imperfections.
+- A prompt contains filter-risk IP/brand/character names without a replacement phrase or post-note warning.

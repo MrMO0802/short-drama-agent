@@ -23,5 +23,10 @@
     "id": "professional_placeholder_resolution",
     "prompt": "参考专业短剧agent格式：本片段场景设定在: <location>L1</location>,<location>L2</location>。分镜1<duration-ms>6000</duration-ms>里使用<role>R5</role>、POV、28mm、内心想但没有张嘴。注意这些标签只是占位符，最终提示词要替换成对应场景、角色和时长，不要照抄标签。",
     "expected": "Resolves professional placeholder tags into concrete scene/role/duration content, uses broad cinematography language beyond the sample, preserves POV ownership and inner-thought/no-mouth rules, and connects the resolved prompt metadata to continuity-first video manifests."
+  },
+  {
+    "id": "mx_shell_workflow_adapter",
+    "prompt": "读取 Mx-Shell 的 ai-shortfilm-prompts 工作流，把 5 段式、真实摄影机镜头、呼吸感、同期声、瑕疵真实感、结尾留白和 IP 规避，优化进短剧agent的逐镜视频提示词里，但不要照抄他的原始提示词。",
+    "expected": "Adds an Mx-Shell-style prompt polish layer that keeps short-drama continuity first while adding concrete theme tags, locked character/scene/material details, camera/lens anchors, subtle camera float or fixed-camera reason, production-audio policy, imperfection anchors, restrained endings, IP/filter warnings, and deterministic tests."
   }
 ]
